@@ -1,0 +1,165 @@
+/* Tibet Akademi Buton ve Hata Mesajları Düzenlemeleri - Siyah-Beyaz Tema */
+
+/* Butonlar için özel stiller */
+.btn, 
+.button, 
+a.btn, 
+a.button, 
+button, 
+input[type="button"], 
+input[type="submit"], 
+input[type="reset"],
+[class*="btn-"],
+[class*="button"] {
+  font-family: "Montserrat", var(--font-roboto), sans-serif !important;
+  font-weight: 600 !important;
+  background-color: var(--button-bg, #000000) !important;
+  color: var(--button-text, #ffffff) !important;
+  border: 1px solid var(--button-bg, #000000) !important;
+  border-radius: 0.25rem !important;
+  padding: 0.5rem 1.25rem !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  text-transform: none !important;
+  letter-spacing: 0.025em !important;
+  box-shadow: none !important;
+}
+
+.btn:hover, 
+.button:hover, 
+a.btn:hover, 
+a.button:hover, 
+button:hover, 
+input[type="button"]:hover, 
+input[type="submit"]:hover, 
+input[type="reset"]:hover,
+[class*="btn-"]:hover,
+[class*="button"]:hover {
+  background-color: var(--button-hover-bg, #333333) !important;
+  color: var(--button-hover-text, #ffffff) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Buton varyasyonları */
+.btn-primary, .button-primary, .primary-button {
+  background-color: var(--button-bg, #000000) !important;
+  color: var(--button-text, #ffffff) !important;
+}
+
+.btn-secondary, .button-secondary, .secondary-button {
+  background-color: var(--text-color, #333333) !important;
+  color: var(--button-text, #ffffff) !important;
+}
+
+.btn-outline, .button-outline, .outline-button {
+  background-color: transparent !important;
+  color: var(--button-bg, #000000) !important;
+  border: 1px solid var(--button-bg, #000000) !important;
+}
+
+.btn-outline:hover, .button-outline:hover, .outline-button:hover {
+  background-color: var(--button-bg, #000000) !important;
+  color: var(--button-text, #ffffff) !important;
+}
+
+/* Özel buton stilleri - referans görseldeki gibi */
+a[href*="Projelerimizi"], 
+a:contains("Projelerimizi Keşfedin"), 
+.cta-primary {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 0.25rem !important;
+  padding: 0.75rem 1.5rem !important;
+  font-weight: 600 !important;
+}
+
+a[href*="Bize"], 
+a:contains("Bize Ulaşın"), 
+.cta-secondary {
+  background-color: transparent !important;
+  color: #000000 !important;
+  border: 1px solid #000000 !important;
+  border-radius: 0.25rem !important;
+  padding: 0.75rem 1.5rem !important;
+  font-weight: 600 !important;
+}
+
+/* Hata mesajları ve uyarılar için detaylı stiller */
+.error, 
+.alert, 
+.warning, 
+.notification,
+.message,
+[class*="error"],
+[class*="alert"],
+[class*="warning"],
+[class*="notification"],
+[class*="message"] {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  color: var(--heading-color, #000000) !important;
+  border: 1px solid var(--heading-color, #000000) !important;
+  border-radius: 0.25rem !important;
+  padding: 0.75rem 1rem !important;
+  margin: 1rem 0 !important;
+  font-family: var(--font-roboto), "Open Sans", sans-serif !important;
+}
+
+/* Başarı mesajları */
+.success,
+[class*="success"] {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  color: var(--heading-color, #000000) !important;
+  border-color: var(--heading-color, #000000) !important;
+}
+
+/* Form elemanları */
+input, 
+select, 
+textarea {
+  border: 1px solid var(--text-color, #333333) !important;
+  border-radius: 0.25rem !important;
+  padding: 0.5rem !important;
+  font-family: var(--font-roboto), "Open Sans", sans-serif !important;
+  color: var(--text-color, #333333) !important;
+  background-color: #fff !important;
+}
+
+input:focus, 
+select:focus, 
+textarea:focus {
+  outline: none !important;
+  border-color: var(--heading-color, #000000) !important;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Navigasyon menüsü */
+nav a, 
+.nav-link, 
+.navbar a,
+[class*="nav-item"],
+[class*="menu-item"] {
+  color: var(--text-color, #333333) !important;
+  font-family: "Montserrat", var(--font-roboto), sans-serif !important;
+  font-weight: 500 !important;
+}
+
+nav a:hover, 
+.nav-link:hover, 
+.navbar a:hover,
+[class*="nav-item"]:hover,
+[class*="menu-item"]:hover {
+  color: var(--heading-color, #000000) !important;
+  text-decoration: none !important;
+}
+
+/* Aktif menü öğesi */
+nav a.active, 
+.nav-link.active, 
+.navbar a.active,
+[class*="nav-item"].active,
+[class*="menu-item"].active {
+  color: var(--heading-color, #000000) !important;
+  font-weight: 700 !important;
+}
