@@ -31,14 +31,6 @@ const FeaturedProjectsCarousel: React.FC<FeaturedProjectsCarouselProps> = ({ pro
   const itemWidthRef = useRef<number>(0);
   const projectRefs = useRef<(HTMLDivElement | null)[]>([]);
   
-  // Mouse interaction tracking
-  const isDraggingRef = useRef<boolean>(false);
-  const startXRef = useRef<number>(0);
-  const startScrollRef = useRef<number>(0);
-  const lastMouseXRef = useRef<number>(0);
-  const velocityRef = useRef<number>(0);
-  const lastMoveTimeRef = useRef<number>(0);
-  
   // Timer for auto-resume after scroll pause
   const resumeTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -82,7 +74,7 @@ const FeaturedProjectsCarousel: React.FC<FeaturedProjectsCarouselProps> = ({ pro
     };
   }, [projects.length, isPaused]);
 
-  // Animation function for smooth scrolling - UPDATED with consistent speed
+  // Animation function for smooth scrolling with consistent speed
   const animate = (timestamp: number) => {
     if (!lastTimeRef.current) lastTimeRef.current = timestamp;
     const elapsed = timestamp - lastTimeRef.current;
@@ -90,7 +82,7 @@ const FeaturedProjectsCarousel: React.FC<FeaturedProjectsCarouselProps> = ({ pro
     if (elapsed > 16 && !isPaused) { // Limit to ~60fps
       lastTimeRef.current = timestamp;
       
-      // Calculate new scroll position - REDUCED speed for smoother movement
+      // Calculate new scroll position - consistent scroll speed
       scrollPositionRef.current -= 0.3; // Consistent scroll speed
       
       // Reset position for infinite loop
@@ -146,10 +138,8 @@ const FeaturedProjectsCarousel: React.FC<FeaturedProjectsCarouselProps> = ({ pro
     
     // Set new timer to resume animation after 500ms (0.5 seconds)
     resumeTimerRef.current = setTimeout(() => {
-      if (!isDraggingRef.current) {
-        setIsPaused(false);
-        startAnimation();
-      }
+      setIsPaused(false);
+      startAnimation();
       resumeTimerRef.current = null;
     }, 500);
   };
@@ -162,130 +152,23 @@ const FeaturedProjectsCarousel: React.FC<FeaturedProjectsCarouselProps> = ({ pro
   };
 
   const handleMouseLeave = () => {
-    // Only restart animation if not dragging
-    if (!isDraggingRef.current) {
-      setHoverIndex(-1);
-      // Set timer to resume animation after delay
-      setAutoResumeTimer();
-    }
+    setHoverIndex(-1);
+    // Set timer to resume animation after delay
+    setAutoResumeTimer();
   };
 
   // Enhanced item hover with immediate visual feedback
   const handleItemHover = (index: number) => {
-    // Only respond to hover if not dragging
-    if (!isDraggingRef.current) {
-      const realIndex = index % projects.length;
-      setHoverIndex(realIndex);
-      
-      // Immediately adjust scroll position to center the hovered item
-      if (scrollRef.current && isPaused) {
-        const newPosition = -(realIndex * itemWidthRef.current);
-        scrollPositionRef.current = newPosition;
-        scrollRef.current.style.transform = `translateX(${newPosition}px)`;
-        setActiveIndex(realIndex);
-      }
-    }
-  };
-
-  // IMPROVED: Mouse drag handling with strict velocity limiting
-  const handleMouseDown = (e: React.MouseEvent) => {
-    isDraggingRef.current = true;
-    startXRef.current = e.clientX;
-    startScrollRef.current = scrollPositionRef.current;
-    lastMouseXRef.current = e.clientX;
-    lastMoveTimeRef.current = Date.now();
-    velocityRef.current = 0;
+    const realIndex = index % projects.length;
+    setHoverIndex(realIndex);
     
-    // Clear any pending auto-resume
-    clearAutoResumeTimer();
-    
-    // Add event listeners for drag
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-    
-    // Prevent default to avoid text selection during drag
-    e.preventDefault();
-  };
-
-  const handleMouseMove = (e: MouseEvent) => {
-    if (isDraggingRef.current && scrollRef.current) {
-      const currentTime = Date.now();
-      const deltaTime = currentTime - lastMoveTimeRef.current;
-      
-      // Calculate movement
-      const deltaX = e.clientX - lastMouseXRef.current;
-      
-      // Calculate velocity (pixels per millisecond)
-      if (deltaTime > 0) {
-        // Apply stronger smoothing to velocity calculation
-        const newVelocity = deltaX / deltaTime;
-        velocityRef.current = velocityRef.current * 0.7 + newVelocity * 0.3; // Weighted average for smoother velocity
-      }
-      
-      // IMPROVED: Apply stricter velocity limiting to prevent erratic movement
-      const maxVelocity = 0.8; // Reduced maximum velocity in pixels per millisecond
-      const limitedVelocity = Math.max(-maxVelocity, Math.min(maxVelocity, velocityRef.current));
-      
-      // Apply movement with limited velocity
-      const movement = limitedVelocity * deltaTime;
-      const newPosition = scrollPositionRef.current + movement;
-      
-      // Update position
+    // Immediately adjust scroll position to center the hovered item
+    if (scrollRef.current && isPaused) {
+      const newPosition = -(realIndex * itemWidthRef.current);
       scrollPositionRef.current = newPosition;
       scrollRef.current.style.transform = `translateX(${newPosition}px)`;
-      
-      // Update tracking variables
-      lastMouseXRef.current = e.clientX;
-      lastMoveTimeRef.current = currentTime;
-      
-      // Update active index
-      const newActiveIndex = Math.floor(Math.abs(scrollPositionRef.current) / itemWidthRef.current) % projects.length;
-      if (newActiveIndex !== activeIndex) {
-        setActiveIndex(newActiveIndex);
-      }
+      setActiveIndex(realIndex);
     }
-  };
-
-  const handleMouseUp = () => {
-    isDraggingRef.current = false;
-    
-    // Remove event listeners
-    document.removeEventListener('mousemove', handleMouseMove);
-    document.removeEventListener('mouseup', handleMouseUp);
-    
-    // Apply inertia for natural stopping with reduced momentum
-    const inertiaAnimation = (timestamp: number) => {
-      // Apply stronger friction to quickly reduce velocity
-      velocityRef.current *= 0.9; // Increased friction for quicker stopping
-      
-      // Stop animation when velocity is very low
-      if (Math.abs(velocityRef.current) < 0.01) {
-        // Snap to nearest project
-        const nearestIndex = Math.round(Math.abs(scrollPositionRef.current) / itemWidthRef.current) % projects.length;
-        scrollToIndex(nearestIndex);
-        
-        // Set timer to resume animation after delay
-        setAutoResumeTimer();
-        return;
-      }
-      
-      // Apply movement based on current velocity
-      if (scrollRef.current) {
-        scrollPositionRef.current += velocityRef.current * 16; // Assuming ~60fps (16ms)
-        scrollRef.current.style.transform = `translateX(${scrollPositionRef.current}px)`;
-        
-        // Update active index
-        const newActiveIndex = Math.floor(Math.abs(scrollPositionRef.current) / itemWidthRef.current) % projects.length;
-        if (newActiveIndex !== activeIndex) {
-          setActiveIndex(newActiveIndex);
-        }
-      }
-      
-      requestAnimationFrame(inertiaAnimation);
-    };
-    
-    // Start inertia animation
-    requestAnimationFrame(inertiaAnimation);
   };
 
   // Handle manual navigation with improved behavior
@@ -343,14 +226,11 @@ const FeaturedProjectsCarousel: React.FC<FeaturedProjectsCarouselProps> = ({ pro
 
   return (
     <div className="w-full py-8 unified-card rounded-lg">
-      {/* Removed duplicate heading as requested */}
-      
       <div 
         className="relative overflow-hidden mx-auto max-w-7xl px-4"
         ref={containerRef}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        onMouseDown={handleMouseDown}
       >
         {/* Carousel container */}
         <div 
