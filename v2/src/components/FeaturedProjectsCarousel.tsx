@@ -38,6 +38,9 @@ const FeaturedProjectsCarousel: React.FC<FeaturedProjectsCarouselProps> = ({ pro
   const lastMouseXRef = useRef<number>(0);
   const velocityRef = useRef<number>(0);
   const lastMoveTimeRef = useRef<number>(0);
+  
+  // Timer for auto-resume after scroll pause
+  const resumeTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Clone projects for infinite scroll effect
   const extendedProjects = [...projects, ...projects, ...projects];
@@ -75,10 +78,11 @@ const FeaturedProjectsCarousel: React.FC<FeaturedProjectsCarouselProps> = ({ pro
     return () => {
       window.removeEventListener('resize', initCarousel);
       stopAnimation();
+      clearAutoResumeTimer();
     };
   }, [projects.length, isPaused]);
 
-  // Animation function for smooth scrolling - UPDATED with slower speed
+  // Animation function for smooth scrolling - UPDATED with consistent speed
   const animate = (timestamp: number) => {
     if (!lastTimeRef.current) lastTimeRef.current = timestamp;
     const elapsed = timestamp - lastTimeRef.current;
@@ -87,7 +91,7 @@ const FeaturedProjectsCarousel: React.FC<FeaturedProjectsCarouselProps> = ({ pro
       lastTimeRef.current = timestamp;
       
       // Calculate new scroll position - REDUCED speed for smoother movement
-      scrollPositionRef.current -= 0.3; // Slower scroll speed
+      scrollPositionRef.current -= 0.3; // Consistent scroll speed
       
       // Reset position for infinite loop
       if (Math.abs(scrollPositionRef.current) >= totalWidthRef.current) {
@@ -127,18 +131,42 @@ const FeaturedProjectsCarousel: React.FC<FeaturedProjectsCarouselProps> = ({ pro
     }
   };
 
+  // Clear auto-resume timer
+  const clearAutoResumeTimer = () => {
+    if (resumeTimerRef.current !== null) {
+      clearTimeout(resumeTimerRef.current);
+      resumeTimerRef.current = null;
+    }
+  };
+
+  // Set auto-resume timer
+  const setAutoResumeTimer = () => {
+    // Clear any existing timer first
+    clearAutoResumeTimer();
+    
+    // Set new timer to resume animation after 500ms (0.5 seconds)
+    resumeTimerRef.current = setTimeout(() => {
+      if (!isDraggingRef.current) {
+        setIsPaused(false);
+        startAnimation();
+      }
+      resumeTimerRef.current = null;
+    }, 500);
+  };
+
   // Handle mouse interactions with guaranteed pause and position preservation
   const handleMouseEnter = () => {
     setIsPaused(true);
     stopAnimation(); // Immediately stop animation
+    clearAutoResumeTimer(); // Clear any pending auto-resume
   };
 
   const handleMouseLeave = () => {
     // Only restart animation if not dragging
     if (!isDraggingRef.current) {
-      setIsPaused(false);
       setHoverIndex(-1);
-      startAnimation(); // Restart animation from current position
+      // Set timer to resume animation after delay
+      setAutoResumeTimer();
     }
   };
 
@@ -159,7 +187,7 @@ const FeaturedProjectsCarousel: React.FC<FeaturedProjectsCarouselProps> = ({ pro
     }
   };
 
-  // IMPROVED: Mouse drag handling with velocity limiting
+  // IMPROVED: Mouse drag handling with strict velocity limiting
   const handleMouseDown = (e: React.MouseEvent) => {
     isDraggingRef.current = true;
     startXRef.current = e.clientX;
@@ -167,6 +195,9 @@ const FeaturedProjectsCarousel: React.FC<FeaturedProjectsCarouselProps> = ({ pro
     lastMouseXRef.current = e.clientX;
     lastMoveTimeRef.current = Date.now();
     velocityRef.current = 0;
+    
+    // Clear any pending auto-resume
+    clearAutoResumeTimer();
     
     // Add event listeners for drag
     document.addEventListener('mousemove', handleMouseMove);
@@ -186,11 +217,13 @@ const FeaturedProjectsCarousel: React.FC<FeaturedProjectsCarouselProps> = ({ pro
       
       // Calculate velocity (pixels per millisecond)
       if (deltaTime > 0) {
-        velocityRef.current = deltaX / deltaTime;
+        // Apply stronger smoothing to velocity calculation
+        const newVelocity = deltaX / deltaTime;
+        velocityRef.current = velocityRef.current * 0.7 + newVelocity * 0.3; // Weighted average for smoother velocity
       }
       
-      // IMPROVED: Apply velocity limiting to prevent erratic movement
-      const maxVelocity = 2; // Maximum velocity in pixels per millisecond
+      // IMPROVED: Apply stricter velocity limiting to prevent erratic movement
+      const maxVelocity = 0.8; // Reduced maximum velocity in pixels per millisecond
       const limitedVelocity = Math.max(-maxVelocity, Math.min(maxVelocity, velocityRef.current));
       
       // Apply movement with limited velocity
@@ -220,16 +253,19 @@ const FeaturedProjectsCarousel: React.FC<FeaturedProjectsCarouselProps> = ({ pro
     document.removeEventListener('mousemove', handleMouseMove);
     document.removeEventListener('mouseup', handleMouseUp);
     
-    // Apply inertia for natural stopping
+    // Apply inertia for natural stopping with reduced momentum
     const inertiaAnimation = (timestamp: number) => {
-      // Apply friction to gradually reduce velocity
-      velocityRef.current *= 0.95;
+      // Apply stronger friction to quickly reduce velocity
+      velocityRef.current *= 0.9; // Increased friction for quicker stopping
       
       // Stop animation when velocity is very low
       if (Math.abs(velocityRef.current) < 0.01) {
         // Snap to nearest project
         const nearestIndex = Math.round(Math.abs(scrollPositionRef.current) / itemWidthRef.current) % projects.length;
         scrollToIndex(nearestIndex);
+        
+        // Set timer to resume animation after delay
+        setAutoResumeTimer();
         return;
       }
       
@@ -252,9 +288,14 @@ const FeaturedProjectsCarousel: React.FC<FeaturedProjectsCarouselProps> = ({ pro
     requestAnimationFrame(inertiaAnimation);
   };
 
-  // Handle manual navigation
+  // Handle manual navigation with improved behavior
   const scrollToIndex = (index: number) => {
     if (scrollRef.current) {
+      // Ensure we're paused during manual navigation
+      setIsPaused(true);
+      stopAnimation();
+      clearAutoResumeTimer();
+      
       const newIndex = (index + projects.length) % projects.length;
       const newPosition = -(newIndex * itemWidthRef.current);
       
@@ -280,6 +321,9 @@ const FeaturedProjectsCarousel: React.FC<FeaturedProjectsCarouselProps> = ({ pro
           // Animation complete
           setActiveIndex(newIndex);
           setHoverIndex(newIndex);
+          
+          // Set timer to resume animation after delay
+          setAutoResumeTimer();
         }
       };
       
