@@ -7,6 +7,7 @@ import MarqueeText from './MarqueeText';
 const FullscreenHero = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [particles, setParticles] = useState<React.ReactNode[]>([]);
   const heroRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -28,6 +29,9 @@ const FullscreenHero = () => {
     };
     
     window.addEventListener('mousemove', handleMouseMove);
+    
+    // Generate particles only on client-side to avoid hydration mismatch
+    setParticles(generateParticles(20));
     
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
@@ -79,7 +83,7 @@ const FullscreenHero = () => {
         }}
       >
         <div className="absolute top-0 left-0 w-full h-full">
-          {generateParticles(20)}
+          {particles}
         </div>
       </div>
 
