@@ -1,0 +1,164 @@
+/* Tibet Akademi Mavi Tonları Kaldırma - Siyah-Beyaz Tema */
+
+/* Tüm mavi tonlarını kaldırma ve siyah-beyaz tema ile uyumlu hale getirme */
+
+/* Mavi bağlantılar */
+a[href], a:link, a:visited, a:hover, a:active {
+  color: var(--heading-color, #000000) !important;
+  text-decoration: none !important;
+}
+
+a[href]:hover, a:link:hover, a:visited:hover {
+  color: var(--button-hover-bg, #333333) !important;
+  text-decoration: underline !important;
+}
+
+/* Mavi arka planlar */
+[class*="bg-blue"],
+[style*="background-color: blue"],
+[style*="background-color:#0000ff"],
+[style*="background-color: #0000ff"],
+[style*="background-color:rgb(0,0,255)"],
+[style*="background-color: rgb(0,0,255)"],
+[style*="background-color:rgba(0,0,255"],
+[style*="background-color: rgba(0,0,255"],
+[style*="background-color:#4361ee"],
+[style*="background-color: #4361ee"],
+[style*="background-color:rgb(67,97,238)"],
+[style*="background-color: rgb(67,97,238)"],
+[style*="background-color:rgba(67,97,238"],
+[style*="background-color: rgba(67,97,238"],
+[style*="background-color:rgba(59,130,246"],
+[style*="background-color: rgba(59,130,246"] {
+  background-color: var(--button-bg, #000000) !important;
+  color: var(--button-text, #ffffff) !important;
+}
+
+/* Mavi metin */
+[class*="text-blue"],
+[style*="color: blue"],
+[style*="color:#0000ff"],
+[style*="color: #0000ff"],
+[style*="color:rgb(0,0,255)"],
+[style*="color: rgb(0,0,255)"],
+[style*="color:rgba(0,0,255"],
+[style*="color: rgba(0,0,255"],
+[style*="color:#4361ee"],
+[style*="color: #4361ee"],
+[style*="color:rgb(67,97,238)"],
+[style*="color: rgb(67,97,238)"],
+[style*="color:rgba(67,97,238"],
+[style*="color: rgba(67,97,238"],
+[style*="color:rgba(59,130,246"],
+[style*="color: rgba(59,130,246"] {
+  color: var(--heading-color, #000000) !important;
+}
+
+/* Mavi kenarlıklar */
+[style*="border-color: blue"],
+[style*="border-color:#0000ff"],
+[style*="border-color: #0000ff"],
+[style*="border-color:rgb(0,0,255)"],
+[style*="border-color: rgb(0,0,255)"],
+[style*="border-color:rgba(0,0,255"],
+[style*="border-color: rgba(0,0,255"],
+[style*="border-color:#4361ee"],
+[style*="border-color: #4361ee"],
+[style*="border-color:rgb(67,97,238)"],
+[style*="border-color: rgb(67,97,238)"],
+[style*="border-color:rgba(67,97,238"],
+[style*="border-color: rgba(67,97,238"],
+[style*="border-color:rgba(59,130,246"],
+[style*="border-color: rgba(59,130,246"],
+[class*="border-blue"] {
+  border-color: var(--heading-color, #000000) !important;
+}
+
+/* Mavi gölgeler */
+[style*="text-shadow"],
+[style*="box-shadow"],
+[style*="drop-shadow"] {
+  text-shadow: none !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1)) !important;
+}
+
+/* Mavi SVG ve ikonlar */
+svg[fill="blue"],
+svg[stroke="blue"],
+svg[fill="#0000ff"],
+svg[stroke="#0000ff"],
+svg[fill="#4361ee"],
+svg[stroke="#4361ee"],
+svg[fill="rgb(0,0,255)"],
+svg[stroke="rgb(0,0,255)"],
+svg[fill="rgb(67,97,238)"],
+svg[stroke="rgb(67,97,238)"],
+.icon-blue,
+[class*="icon-blue"],
+i.blue,
+i[class*="blue"],
+i[style*="color: blue"],
+i[style*="color:#0000ff"],
+i[style*="color:#4361ee"] {
+  fill: var(--heading-color, #000000) !important;
+  stroke: var(--heading-color, #000000) !important;
+  color: var(--heading-color, #000000) !important;
+}
+
+/* Mavi gradyanlar */
+[style*="linear-gradient"],
+[style*="radial-gradient"] {
+  background-image: linear-gradient(to right, var(--heading-color, #000000), var(--text-color, #333333)) !important;
+}
+
+/* Sosyal medya ikonları */
+.facebook, .twitter, .linkedin, .instagram, .youtube,
+[class*="facebook"], [class*="twitter"], [class*="linkedin"], [class*="instagram"], [class*="youtube"] {
+  color: var(--heading-color, #000000) !important;
+  background-color: transparent !important;
+}
+
+/* Özel durum: Mavi tonlarını içeren özel sınıflar */
+.primary, .info, .highlight, 
+[class*="primary"], [class*="info"], [class*="highlight"] {
+  color: var(--heading-color, #000000) !important;
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  border-color: var(--heading-color, #000000) !important;
+}
+
+/* Arka plan renkleri */
+body {
+  background-color: #ffffff !important;
+}
+
+.bg-white, .bg-gray-50, .bg-gray-100, .bg-gray-200, 
+[class*="bg-white"], [class*="bg-gray"] {
+  background-color: #ffffff !important;
+}
+
+/* Özel durum: tibetakademi.com logosu */
+a:has(> span:contains("tibetakademi.com")), 
+a:contains("tibetakademi.com"), 
+.logo, 
+.site-logo {
+  color: #000000 !important;
+  font-weight: 700 !important;
+}
+
+/* Tüm başlıklar için siyah renk */
+h1, h2, h3, h4, h5, h6,
+[class*="heading"], [class*="title"], [class*="header"] {
+  color: #000000 !important;
+  text-shadow: none !important;
+}
+
+/* Hero bölümü başlığı için özel stil */
+.hero h1, .hero h2, 
+[class*="hero"] h1, [class*="hero"] h2,
+main > section:first-child h1,
+main > section:first-child h2 {
+  color: #000000 !important;
+  font-weight: 900 !important;
+  text-shadow: none !important;
+}
