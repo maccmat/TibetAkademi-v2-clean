@@ -1,93 +1,36 @@
 // admin.js - Tibet Akademi admin panel işlevselliği
 // Bu dosya, admin panelindeki yorum yönetim işlevlerini kontrol eder
 
-// Sayfa yüklendiğinde çalışacak fonksiyonlar
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('Admin.js loaded and running');
-  
   // Admin giriş formunu kontrol et
   const loginForm = document.querySelector('form');
-  console.log('Login form found:', !!loginForm);
-  
   if (loginForm) {
-    console.log('Adding submit event listener to login form');
-    
     loginForm.addEventListener('submit', function(e) {
       e.preventDefault();
-      console.log('Form submitted');
-      
-      const passwordInput = document.getElementById('password');
-      console.log('Password input found:', !!passwordInput);
-      
-      if (!passwordInput) {
-        console.error('Password input not found');
-        return;
-      }
-      
-      const password = passwordInput.value;
-      console.log('Password entered:', password);
+      const password = document.getElementById('password').value;
       
       // Şifre kontrolü
       if (password === 'tibet2025') {
-        console.log('Password correct, loading admin panel');
+        // Şifre doğruysa admin panelini göster
         loadAdminPanel();
       } else {
-        console.log('Incorrect password');
         alert('Hatalı şifre!');
       }
     });
-  } else {
-    console.log('Login form not found, checking if already in admin dashboard');
-    // Zaten giriş yapılmışsa admin panelini yükle
-    if (document.querySelector('.admin-dashboard')) {
-      console.log('Admin dashboard found, initializing');
-      initializeAdminPanel();
-    } else {
-      console.log('Neither login form nor admin dashboard found');
-    }
   }
   
-  // Doğrudan giriş butonu için alternatif olay dinleyici
-  const loginButton = document.querySelector('button[type="submit"]');
-  if (loginButton) {
-    console.log('Adding click event listener to login button');
-    
-    loginButton.addEventListener('click', function(e) {
-      e.preventDefault();
-      console.log('Login button clicked');
-      
-      const passwordInput = document.getElementById('password');
-      if (!passwordInput) {
-        console.error('Password input not found');
-        return;
-      }
-      
-      const password = passwordInput.value;
-      console.log('Password entered:', password);
-      
-      // Şifre kontrolü
-      if (password === 'tibet2025') {
-        console.log('Password correct, loading admin panel');
-        loadAdminPanel();
-      } else {
-        console.log('Incorrect password');
-        alert('Hatalı şifre!');
-      }
-    });
+  // Zaten giriş yapılmışsa admin panelini yükle
+  if (document.querySelector('.admin-dashboard')) {
+    initializeAdminPanel();
   }
 });
 
 // Admin panelini yükle
 function loadAdminPanel() {
-  console.log('Loading admin panel');
-  
   // Giriş formunu gizle
   const loginContainer = document.querySelector('.sm\\:mx-auto.sm\\:w-full.sm\\:max-w-md');
   if (loginContainer) {
-    console.log('Login container found, hiding it');
     loginContainer.style.display = 'none';
-  } else {
-    console.error('Login container not found');
   }
   
   // Admin panelini oluştur ve göster
@@ -123,12 +66,6 @@ function loadAdminPanel() {
   const contentArea = document.createElement('div');
   contentArea.id = 'admin-content';
   contentArea.className = 'bg-white rounded-lg shadow-md p-6';
-  contentArea.innerHTML = `
-    <div class="text-center py-8">
-      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-color mx-auto"></div>
-      <p class="mt-4 text-gray-600">Yorumlar yükleniyor...</p>
-    </div>
-  `;
   
   // Admin panelini sayfaya ekle
   adminContainer.appendChild(header);
@@ -138,29 +75,22 @@ function loadAdminPanel() {
   // Admin panelini sayfaya ekle
   const mainContent = document.querySelector('main');
   if (mainContent) {
-    console.log('Main content found, adding admin panel');
     mainContent.innerHTML = '';
     mainContent.appendChild(adminContainer);
     
     // Admin panel işlevselliğini başlat
     initializeAdminPanel();
-  } else {
-    console.error('Main content element not found');
   }
 }
 
 // Admin panel işlevselliğini başlat
 function initializeAdminPanel() {
-  console.log('Initializing admin panel');
-  
   // Tab değiştirme işlevselliği
   const tabPending = document.getElementById('tab-pending');
   const tabApproved = document.getElementById('tab-approved');
   const tabFacebook = document.getElementById('tab-facebook');
   
   if (tabPending && tabApproved && tabFacebook) {
-    console.log('Tab elements found');
-    
     // Yorum sayılarını güncelle
     updateCommentCounts();
     
@@ -169,31 +99,24 @@ function initializeAdminPanel() {
     
     // Tab tıklama olaylarını ekle
     tabPending.addEventListener('click', function() {
-      console.log('Pending tab clicked');
       setActiveTab(tabPending);
       showPendingComments();
     });
     
     tabApproved.addEventListener('click', function() {
-      console.log('Approved tab clicked');
       setActiveTab(tabApproved);
       showApprovedComments();
     });
     
     tabFacebook.addEventListener('click', function() {
-      console.log('Facebook tab clicked');
       setActiveTab(tabFacebook);
       showFacebookPosts();
     });
-  } else {
-    console.error('Tab elements not found');
   }
 }
 
 // Aktif tab'ı ayarla
 function setActiveTab(activeTab) {
-  console.log('Setting active tab:', activeTab.id);
-  
   const tabs = [
     document.getElementById('tab-pending'),
     document.getElementById('tab-approved'),
@@ -211,20 +134,13 @@ function setActiveTab(activeTab) {
 
 // Bekleyen yorumları göster
 function showPendingComments() {
-  console.log('Showing pending comments');
-  
   const contentArea = document.getElementById('admin-content');
-  if (!contentArea) {
-    console.error('Content area not found');
-    return;
-  }
+  if (!contentArea) return;
   
   contentArea.innerHTML = '<div class="text-center py-8"><div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-color mx-auto"></div><p class="mt-4 text-gray-600">Yorumlar yükleniyor...</p></div>';
   
   // Yorumları yükle
   loadComments().then(comments => {
-    console.log('Comments loaded:', comments);
-    
     if (comments.pendingComments.length === 0) {
       contentArea.innerHTML = '<div class="text-center py-8"><p class="text-gray-600">Bekleyen yorum bulunmuyor.</p></div>';
       return;
@@ -299,13 +215,8 @@ function showPendingComments() {
 
 // Onaylanmış yorumları göster
 function showApprovedComments() {
-  console.log('Showing approved comments');
-  
   const contentArea = document.getElementById('admin-content');
-  if (!contentArea) {
-    console.error('Content area not found');
-    return;
-  }
+  if (!contentArea) return;
   
   contentArea.innerHTML = '<div class="text-center py-8"><div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-color mx-auto"></div><p class="mt-4 text-gray-600">Yorumlar yükleniyor...</p></div>';
   
@@ -368,13 +279,8 @@ function showApprovedComments() {
 
 // Facebook paylaşımlarını göster
 function showFacebookPosts() {
-  console.log('Showing Facebook posts');
-  
   const contentArea = document.getElementById('admin-content');
-  if (!contentArea) {
-    console.error('Content area not found');
-    return;
-  }
+  if (!contentArea) return;
   
   contentArea.innerHTML = '<div class="text-center py-8"><div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-color mx-auto"></div><p class="mt-4 text-gray-600">Paylaşımlar yükleniyor...</p></div>';
   
@@ -443,15 +349,9 @@ function showFacebookPosts() {
 
 // Yorum sayılarını güncelle
 function updateCommentCounts() {
-  console.log('Updating comment counts');
-  
   getCommentCounts().then(counts => {
-    const pendingCount = document.getElementById('pending-count');
-    const approvedCount = document.getElementById('approved-count');
-    const facebookCount = document.getElementById('facebook-count');
-    
-    if (pendingCount) pendingCount.textContent = counts.pendingCount;
-    if (approvedCount) approvedCount.textContent = counts.approvedCount;
-    if (facebookCount) facebookCount.textContent = counts.facebookCount;
+    document.getElementById('pending-count').textContent = counts.pendingCount;
+    document.getElementById('approved-count').textContent = counts.approvedCount;
+    document.getElementById('facebook-count').textContent = counts.facebookCount;
   });
 }

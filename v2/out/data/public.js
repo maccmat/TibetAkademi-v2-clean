@@ -1,83 +1,152 @@
-// public.js - Tibet Akademi kullanıcı tarafı JavaScript - Optimize edilmiş versiyon
-// Bu dosya, kullanıcı tarafındaki etkileşimli öğeler için gerekli işlevleri içerir
+// public.js - Tibet Akademi kullanıcı arayüzü işlevselliği
+// Bu dosya, yorumların ana sayfada ve "Sizden Gelenler" sayfasında gösterilmesini sağlar
 
-// Sayfa yüklendiğinde çalışacak fonksiyonlar
 document.addEventListener('DOMContentLoaded', function() {
-  // Lazy loading uygula
-  initLazyLoading();
+  // Ana sayfadaki yorumları yükle
+  const homeCommentsSection = document.querySelector('.home-comments-section');
+  if (homeCommentsSection) {
+    loadHomePageComments();
+  }
+  
+  // Sizden Gelenler sayfasındaki yorumları yükle
+  const commentsPage = document.querySelector('.comments-page');
+  if (commentsPage) {
+    loadCommentsPage();
+  }
   
   // Yorum formunu başlat
   initCommentForm();
-  
-  // Sosyal medya paylaşım butonlarını başlat
-  initSocialSharing();
-  
-  // Galeri görüntüleyiciyi başlat (eğer sayfada galeri varsa)
-  if (document.querySelector('.gallery-grid')) {
-    initGalleryViewer();
-  }
 });
 
-// Lazy loading uygula
-function initLazyLoading() {
-  // Tüm resimleri ve videoları seç
-  const lazyImages = document.querySelectorAll('img[data-src], video[data-src]');
+// Ana sayfadaki yorumları yükle
+function loadHomePageComments() {
+  const commentsContainer = document.querySelector('.home-comments-container');
+  if (!commentsContainer) return;
   
-  // IntersectionObserver kullanarak lazy loading uygula
-  if ('IntersectionObserver' in window) {
-    const lazyObserver = new IntersectionObserver(function(entries, observer) {
-      entries.forEach(function(entry) {
-        if (entry.isIntersecting) {
-          const lazyElement = entry.target;
-          
-          if (lazyElement.tagName === 'IMG') {
-            lazyElement.src = lazyElement.dataset.src;
-            if (lazyElement.dataset.srcset) {
-              lazyElement.srcset = lazyElement.dataset.srcset;
-            }
-          } else if (lazyElement.tagName === 'VIDEO') {
-            const sources = lazyElement.querySelectorAll('source');
-            sources.forEach(function(source) {
-              if (source.dataset.src) {
-                source.src = source.dataset.src;
-              }
-            });
-            lazyElement.load();
-          }
-          
-          lazyElement.removeAttribute('data-src');
-          lazyElement.removeAttribute('data-srcset');
-          lazyObserver.unobserve(lazyElement);
-        }
-      });
+  loadComments().then(comments => {
+    // En son onaylanan 2 yorumu göster
+    const recentComments = comments.approvedComments.slice(0, 2);
+    
+    if (recentComments.length === 0) {
+      commentsContainer.innerHTML = '<p class="text-gray-500 text-center py-4">Henüz yorum bulunmuyor.</p>';
+      return;
+    }
+    
+    let html = '';
+    
+    recentComments.forEach(comment => {
+      html += `
+        <div class="bg-white rounded-lg shadow-md p-4 mb-4">
+          <div class="flex items-start">
+            <div class="flex-shrink-0 mr-3">
+              <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-semibold text-gray-600">
+                ${comment.name.charAt(0).toUpperCase()}
+              </div>
+            </div>
+            <div>
+              <div class="flex items-center">
+                <h4 class="font-semibold">${comment.name}</h4>
+                <span class="text-gray-500 text-xs ml-2">${comment.date} • ${comment.source}</span>
+              </div>
+              <p class="text-gray-700 mt-1">${comment.content}</p>
+            </div>
+          </div>
+        </div>
+      `;
     });
     
-    lazyImages.forEach(function(lazyElement) {
-      lazyObserver.observe(lazyElement);
+    commentsContainer.innerHTML = html;
+  });
+}
+
+// Sizden Gelenler sayfasındaki yorumları yükle
+function loadCommentsPage() {
+  const commentsContainer = document.querySelector('.comments-list-container');
+  if (!commentsContainer) return;
+  
+  loadComments().then(comments => {
+    if (comments.approvedComments.length === 0) {
+      commentsContainer.innerHTML = '<div class="text-center py-8"><p class="text-gray-600">Henüz onaylanmış yorum bulunmuyor.</p></div>';
+      return;
+    }
+    
+    let html = '';
+    
+    comments.approvedComments.forEach(comment => {
+      html += `
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+          <div class="flex items-start">
+            <div class="flex-shrink-0 mr-4">
+              <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-xl font-semibold text-gray-600">
+                ${comment.name.charAt(0).toUpperCase()}
+              </div>
+            </div>
+            <div class="flex-grow">
+              <div class="flex items-center">
+                <h3 class="font-semibold">${comment.name}</h3>
+                <span class="text-gray-500 text-sm ml-2">${comment.username}</span>
+              </div>
+              <p class="my-2">${comment.content}</p>
+              <div class="text-gray-500 text-sm">
+                ${comment.date} • ${comment.source}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
     });
-  } else {
-    // IntersectionObserver desteklenmiyor, basit bir çözüm uygula
-    setTimeout(function() {
-      lazyImages.forEach(function(lazyElement) {
-        if (lazyElement.tagName === 'IMG') {
-          lazyElement.src = lazyElement.dataset.src;
-          if (lazyElement.dataset.srcset) {
-            lazyElement.srcset = lazyElement.dataset.srcset;
-          }
-        } else if (lazyElement.tagName === 'VIDEO') {
-          const sources = lazyElement.querySelectorAll('source');
-          sources.forEach(function(source) {
-            if (source.dataset.src) {
-              source.src = source.dataset.src;
-            }
-          });
-          lazyElement.load();
-        }
-        
-        lazyElement.removeAttribute('data-src');
-        lazyElement.removeAttribute('data-srcset');
+    
+    commentsContainer.innerHTML = html;
+  });
+  
+  // Facebook paylaşımlarını yükle
+  const facebookContainer = document.querySelector('.facebook-posts-container');
+  if (facebookContainer) {
+    loadComments().then(comments => {
+      if (comments.facebookPosts.length === 0) {
+        facebookContainer.innerHTML = '<div class="text-center py-8"><p class="text-gray-600">Henüz Facebook paylaşımı bulunmuyor.</p></div>';
+        return;
+      }
+      
+      let html = '';
+      
+      comments.facebookPosts.forEach(post => {
+        html += `
+          <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+            <div class="flex items-start">
+              <div class="flex-shrink-0 mr-4">
+                <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-xl font-semibold text-blue-600">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-facebook"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+                </div>
+              </div>
+              <div class="flex-grow">
+                <p class="my-2">${post.content}</p>
+                <div class="text-gray-500 text-sm">
+                  ${post.date}
+                </div>
+                <div class="flex items-center mt-2 text-sm text-gray-600">
+                  <span class="flex items-center mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart mr-1 text-red-500"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg>
+                    ${post.likes}
+                  </span>
+                  <span class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle mr-1 text-blue-500"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg>
+                    ${post.comments}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="mt-4 text-center">
+              <a href="https://facebook.com/tibetakademi" target="_blank" rel="noopener noreferrer" class="inline-block text-blue-600 hover:text-blue-800 font-medium transition-colors">
+                Facebook'ta Görüntüle
+              </a>
+            </div>
+          </div>
+        `;
       });
-    }, 1000);
+      
+      facebookContainer.innerHTML = html;
+    });
   }
 }
 
@@ -89,156 +158,48 @@ function initCommentForm() {
   commentForm.addEventListener('submit', function(e) {
     e.preventDefault();
     
-    // Form verilerini al
-    const formData = new FormData(commentForm);
-    const name = formData.get('name');
-    const email = formData.get('email');
-    const comment = formData.get('comment');
+    const nameInput = this.querySelector('input[name="name"]');
+    const emailInput = this.querySelector('input[name="email"]');
+    const commentInput = this.querySelector('textarea[name="comment"]');
     
-    // Basit doğrulama
-    if (!name || !email || !comment) {
+    if (!nameInput || !emailInput || !commentInput) return;
+    
+    const name = nameInput.value.trim();
+    const email = emailInput.value.trim();
+    const content = commentInput.value.trim();
+    
+    if (!name || !email || !content) {
       alert('Lütfen tüm alanları doldurun.');
       return;
     }
     
-    // Yorum gönderme işlemi (örnek)
-    console.log('Yorum gönderiliyor:', { name, email, comment });
-    
-    // Başarılı gönderim sonrası
-    alert('Yorumunuz başarıyla gönderildi. Onaylandıktan sonra yayınlanacaktır.');
-    commentForm.reset();
-  });
-}
-
-// Sosyal medya paylaşım butonlarını başlat
-function initSocialSharing() {
-  const shareButtons = document.querySelectorAll('.share-button');
-  if (!shareButtons.length) return;
-  
-  shareButtons.forEach(function(button) {
-    button.addEventListener('click', function(e) {
-      e.preventDefault();
-      
-      const platform = this.dataset.platform;
-      const url = encodeURIComponent(window.location.href);
-      const title = encodeURIComponent(document.title);
-      
-      let shareUrl = '';
-      
-      switch (platform) {
-        case 'facebook':
-          shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
-          break;
-        case 'twitter':
-          shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${title}`;
-          break;
-        case 'linkedin':
-          shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
-          break;
-        case 'whatsapp':
-          shareUrl = `https://api.whatsapp.com/send?text=${title} ${url}`;
-          break;
-      }
-      
-      if (shareUrl) {
-        window.open(shareUrl, '_blank', 'width=600,height=400');
+    // Yeni yorumu ekle
+    addNewComment({
+      name: name,
+      username: `@${name.toLowerCase().replace(/\s+/g, '.')}`,
+      content: content,
+      source: 'Website'
+    }).then(result => {
+      if (result.success) {
+        // Formu temizle
+        nameInput.value = '';
+        emailInput.value = '';
+        commentInput.value = '';
+        
+        // Başarı mesajı göster
+        const successMessage = document.createElement('div');
+        successMessage.className = 'bg-green-100 text-green-700 p-4 rounded-lg mt-4';
+        successMessage.innerHTML = '<p>Yorumunuz başarıyla gönderildi ve onay bekliyor. Teşekkür ederiz!</p>';
+        
+        commentForm.appendChild(successMessage);
+        
+        // Mesajı 5 saniye sonra kaldır
+        setTimeout(() => {
+          successMessage.remove();
+        }, 5000);
+      } else {
+        alert('Yorumunuz gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
       }
     });
-  });
-}
-
-// Galeri görüntüleyiciyi başlat
-function initGalleryViewer() {
-  const galleryItems = document.querySelectorAll('.gallery-item');
-  if (!galleryItems.length) return;
-  
-  // Galeri görüntüleyici oluştur
-  const viewer = document.createElement('div');
-  viewer.className = 'gallery-viewer';
-  viewer.innerHTML = `
-    <div class="gallery-viewer-overlay"></div>
-    <div class="gallery-viewer-content">
-      <button class="gallery-viewer-close">&times;</button>
-      <div class="gallery-viewer-image-container">
-        <img class="gallery-viewer-image" src="" alt="">
-      </div>
-      <div class="gallery-viewer-caption"></div>
-      <button class="gallery-viewer-prev">&lt;</button>
-      <button class="gallery-viewer-next">&gt;</button>
-    </div>
-  `;
-  document.body.appendChild(viewer);
-  
-  // Görüntüleyici elemanlarını seç
-  const viewerOverlay = viewer.querySelector('.gallery-viewer-overlay');
-  const viewerContent = viewer.querySelector('.gallery-viewer-content');
-  const viewerClose = viewer.querySelector('.gallery-viewer-close');
-  const viewerImage = viewer.querySelector('.gallery-viewer-image');
-  const viewerCaption = viewer.querySelector('.gallery-viewer-caption');
-  const viewerPrev = viewer.querySelector('.gallery-viewer-prev');
-  const viewerNext = viewer.querySelector('.gallery-viewer-next');
-  
-  // Görüntüleyiciyi kapat
-  function closeViewer() {
-    viewer.style.display = 'none';
-    document.body.style.overflow = '';
-  }
-  
-  // Görüntüleyiciyi aç
-  let currentIndex = 0;
-  function openViewer(index) {
-    currentIndex = index;
-    const item = galleryItems[currentIndex];
-    const image = item.querySelector('img');
-    const caption = item.dataset.caption || '';
-    
-    viewerImage.src = image.dataset.src || image.src;
-    viewerCaption.textContent = caption;
-    
-    viewer.style.display = 'block';
-    document.body.style.overflow = 'hidden';
-    
-    // Önceki/sonraki butonlarını güncelle
-    viewerPrev.style.display = currentIndex > 0 ? 'block' : 'none';
-    viewerNext.style.display = currentIndex < galleryItems.length - 1 ? 'block' : 'none';
-  }
-  
-  // Önceki resme git
-  function showPrevImage() {
-    if (currentIndex > 0) {
-      openViewer(currentIndex - 1);
-    }
-  }
-  
-  // Sonraki resme git
-  function showNextImage() {
-    if (currentIndex < galleryItems.length - 1) {
-      openViewer(currentIndex + 1);
-    }
-  }
-  
-  // Olay dinleyicileri ekle
-  galleryItems.forEach(function(item, index) {
-    item.addEventListener('click', function() {
-      openViewer(index);
-    });
-  });
-  
-  viewerOverlay.addEventListener('click', closeViewer);
-  viewerClose.addEventListener('click', closeViewer);
-  viewerPrev.addEventListener('click', showPrevImage);
-  viewerNext.addEventListener('click', showNextImage);
-  
-  // Klavye olaylarını dinle
-  document.addEventListener('keydown', function(e) {
-    if (viewer.style.display === 'block') {
-      if (e.key === 'Escape') {
-        closeViewer();
-      } else if (e.key === 'ArrowLeft') {
-        showPrevImage();
-      } else if (e.key === 'ArrowRight') {
-        showNextImage();
-      }
-    }
   });
 }
