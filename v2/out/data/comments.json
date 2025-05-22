@@ -1,0 +1,54 @@
+{
+  "pendingComments": [
+    {
+      "id": "1",
+      "name": "Ahmet Yıldız",
+      "username": "@ahmet.yildiz",
+      "content": "Erasmus+ programı hakkında daha fazla bilgi alabilir miyim? Başvuru süreci nasıl işliyor?",
+      "date": "22 Mayıs 2025 09:15",
+      "source": "Instagram"
+    },
+    {
+      "id": "2",
+      "name": "Zeynep Kaya",
+      "username": "@zeynepkaya",
+      "content": "Kültürlerarası Diyalog projesine katılmak istiyorum. Bir sonraki etkinlik ne zaman?",
+      "date": "21 Mayıs 2025 16:30",
+      "source": "Twitter"
+    }
+  ],
+  "approvedComments": [
+    {
+      "id": "3",
+      "name": "Ayşe Yılmaz",
+      "username": "@ayse.yilmaz",
+      "content": "Kültürlerarası Diyalog projesine katıldım, harika bir deneyimdi! Yeni arkadaşlar edinmek ve farklı kültürleri tanımak için mükemmel bir fırsat.",
+      "date": "21 Mayıs 2025 08:30",
+      "source": "Instagram"
+    },
+    {
+      "id": "4",
+      "name": "Mehmet Kaya",
+      "username": "@mehmetkaya",
+      "content": "Erasmus+ programı sayesinde İspanya'da bir ay geçirdim. Kesinlikle herkese tavsiye ederim!",
+      "date": "20 Mayıs 2025 15:45",
+      "source": "Twitter"
+    }
+  ],
+  "facebookPosts": [
+    {
+      "id": "5",
+      "content": "Yeni projemiz \"Kültürlerarası Diyalog\" kapsamında Avrupa'dan gelen katılımcılarla harika bir çalıştay gerçekleştirdik!",
+      "date": "20 Mayıs 2025 10:30",
+      "likes": 45,
+      "comments": 12
+    },
+    {
+      "id": "6",
+      "content": "Erasmus+ programı kapsamında yeni başvuru dönemimiz başladı! Detaylı bilgi için web sitemizi ziyaret edebilirsiniz.",
+      "date": "18 Mayıs 2025 14:15",
+      "likes": 32,
+      "comments": 8
+    }
+  ]
+}
