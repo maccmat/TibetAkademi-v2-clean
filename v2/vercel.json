@@ -8,10 +8,5 @@
         "installCommand": "npm install --legacy-peer-deps"
       }
     }
-  ],
-  "build": {
-    "env": {
-      "VERCEL_CACHE": "false"
-    }
-  }
+  ]
 }
